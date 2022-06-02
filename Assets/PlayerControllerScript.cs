@@ -9,7 +9,8 @@ public class PlayerControllerScript : MonoBehaviour
     public GameObject theBall;
     private bool ballInFlight = false;
 
-  
+    // Reference to managers
+    public GameObject cameraManager;
 
     public Transform aimTransform;
 
@@ -18,7 +19,14 @@ public class PlayerControllerScript : MonoBehaviour
     void Start()
     {
         primaryPlayer = ReInput.players.GetPlayer(0);
-      //  aimDirection = new Vector3(0f, 1f, 1f);
+        //  aimDirection = new Vector3(0f, 1f, 1f);
+
+        Reset();
+    }
+
+    public void Reset()
+    {
+        cameraManager = GameObject.FindGameObjectWithTag("CameraManager");
     }
 
     // Update is called once per frame
@@ -35,6 +43,8 @@ public class PlayerControllerScript : MonoBehaviour
             theBall.GetComponent<Rigidbody>().AddForce(aimTransform.forward*800f);
             // Activate gravity on the ball
             theBall.GetComponent<Rigidbody>().useGravity = true;
+
+            cameraManager.GetComponent<CameraManagerScript>().SwitchToBallChaseCamera();
 
         }
 
