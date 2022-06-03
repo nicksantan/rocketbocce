@@ -11,13 +11,22 @@ public class PlayerControllerScript : MonoBehaviour
 
     // Reference to managers
     public GameObject cameraManager;
+    public GameObject previewBallManager;
 
     public Transform aimTransform;
+    public enum GamePhase { throwing, ballInFlight }
+    public GamePhase currentPhase;
 
-  
+    public float currentPowerInput;
+
+    public int frameCounter = 0;
+    private bool firePreviewBall = false;
+    private float maxFirePower = 500f;
+
     // Start is called before the first frame update
     void Start()
     {
+        Time.timeScale = 0.33f;
         primaryPlayer = ReInput.players.GetPlayer(0);
         //  aimDirection = new Vector3(0f, 1f, 1f);
 
@@ -27,41 +36,80 @@ public class PlayerControllerScript : MonoBehaviour
     public void Reset()
     {
         cameraManager = GameObject.FindGameObjectWithTag("CameraManager");
+        previewBallManager = GameObject.FindGameObjectWithTag("PreviewBallManager");
+        currentPhase = GamePhase.throwing;
     }
 
+    private void FixedUpdate()
+    {
+        frameCounter += 1;
+        frameCounter = frameCounter % 5;
+        if (frameCounter == 0)
+        {
+            firePreviewBall = true;
+        }
+    }
     // Update is called once per frame
-    void Update() { 
+    void Update() {
 
-       //Vector3 forward = transform.TransformDirection(aimDirection.normalized) * 100;
-        Debug.DrawRay(new Vector3(0f, 0f, -6.8f), aimTransform.transform.forward, Color.green);
-    
-        if (primaryPlayer.GetButtonDown("Fire") && !ballInFlight)
+        // Is the player throwing??
+        if (currentPhase == GamePhase.throwing)
         {
-            Debug.Log("Firing");
-            ballInFlight = true;
-            // Gather all factors and apply the force to the ball
-            theBall.GetComponent<Rigidbody>().AddForce(aimTransform.forward*800f);
-            // Activate gravity on the ball
-            theBall.GetComponent<Rigidbody>().useGravity = true;
+            // Start calling preview balls and fire them at the current level!
+           
+            if (firePreviewBall && currentPowerInput > .15f)
+            {
+                GameObject previewBall = previewBallManager.GetComponent<PreviewBallManager>().GetBall();
+                previewBall.transform.position = new Vector3(0f, 0f, -6.8f);
+                previewBall.GetComponent<Rigidbody>().AddForce(aimTransform.forward * (maxFirePower * currentPowerInput));
+                firePreviewBall = false;
+            }
+            //Vector3 forward = transform.TransformDirection(aimDirection.normalized) * 100;
+            Debug.DrawRay(new Vector3(0f, 0f, -6.8f), aimTransform.transform.forward, Color.green);
 
-            cameraManager.GetComponent<CameraManagerScript>().SwitchToBallChaseCamera();
+            if (primaryPlayer.GetButtonDown("Fire") && !ballInFlight)
+            {
+                Debug.Log("Firing");
+                ballInFlight = true;
+                // Gather all factors and apply the force to the ball
+                theBall.GetComponent<Rigidbody>().AddForce(aimTransform.forward * (maxFirePower * currentPowerInput));
+                // Activate gravity on the ball
+                theBall.GetComponent<Rigidbody>().useGravity = true;
 
+                cameraManager.GetComponent<CameraManagerScript>().SwitchToBallChaseCamera();
+                currentPhase = GamePhase.ballInFlight;
+                previewBallManager.GetComponent<PreviewBallManager>().RemovePreviews();
+                Time.timeScale = .7f;
+
+            }
+
+            if (primaryPlayer.GetButtonDown("Reset"))
+            {
+                Debug.Log("Resetting the ball");
+                ballInFlight = false;
+                // MOve it back to position
+                theBall.transform.position = new Vector3(0f, 0f, -6.8f);
+                //Turn off gravity and zero out velocity
+                theBall.GetComponent<Rigidbody>().velocity = new Vector3(0f, 0f, 0f);
+                // Activate gravity on the ball
+                theBall.GetComponent<Rigidbody>().useGravity = false;
+
+            }
+
+            GetMoveValue();
+            GetPowerValue();
+            Debug.Log(currentPowerInput);
         }
 
-        if (primaryPlayer.GetButtonDown("Reset"))
+        if (currentPhase == GamePhase.ballInFlight)
         {
-            Debug.Log("Resetting the ball");
-            ballInFlight = false;
-            // MOve it back to position
-            theBall.transform.position = new Vector3(0f, 0f, -6.8f);
-            //Turn off gravity and zero out velocity
-            theBall.GetComponent<Rigidbody>().velocity = new Vector3(0f, 0f, 0f);
-            // Activate gravity on the ball
-            theBall.GetComponent<Rigidbody>().useGravity = false;
 
         }
+    }
 
-        GetMoveValue();
+    void GetPowerValue()
+    {
+        currentPowerInput = primaryPlayer.GetAxis("Power");
     }
 
     void GetMoveValue()

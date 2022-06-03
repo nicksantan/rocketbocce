@@ -17,9 +17,8 @@ public class BallChaseCameraScript : MonoBehaviour
     void Update()
     {
         if (targetBall)
-            Debug.Log("chasing");
         {
-            transform.position = new Vector3(targetBall.transform.position.x, targetBall.transform.position.y + 1.47f, targetBall.transform.position.z - 1.44f);
+            transform.position = new Vector3(targetBall.transform.position.x, targetBall.transform.position.y + 1.47f, targetBall.transform.position.z - 1.94f);
         }
     }
 }
