@@ -38,6 +38,7 @@ public class PlayerControllerScript : MonoBehaviour
         cameraManager = GameObject.FindGameObjectWithTag("CameraManager");
         previewBallManager = GameObject.FindGameObjectWithTag("PreviewBallManager");
         currentPhase = GamePhase.throwing;
+
     }
 
     private void FixedUpdate()
@@ -63,6 +64,7 @@ public class PlayerControllerScript : MonoBehaviour
             // Activate gravity on the ball
             theBall.GetComponent<Rigidbody>().useGravity = false;
             currentPhase = GamePhase.throwing;
+            previewBallManager.GetComponent<PreviewBallManager>().RestorePreviews();
 
         }
 
