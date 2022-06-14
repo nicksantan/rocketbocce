@@ -6,6 +6,8 @@ TagManager:
   tags:
   - CameraManager
   - PreviewBallManager
+  - TeamOne
+  - TeamTwo
   layers:
   - Default
   - TransparentFX

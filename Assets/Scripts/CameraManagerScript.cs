@@ -19,9 +19,14 @@ public class CameraManagerScript : MonoBehaviour
         
     }
 
-    public void SwitchToBallChaseCamera()
+    public void ReturnToServingCamera(GameObject whichBall){
+        ballChaseCamera.GetComponent<Camera>().enabled = false;
+        // Is more needed here?
+    }
+    public void SwitchToBallChaseCamera(GameObject whichBall)
     {
-        // Turn off all cameras?
+        // TODO: Turn off all cameras?
+        ballChaseCamera.GetComponent<BallChaseCameraScript>().targetBall = whichBall;
         ballChaseCamera.GetComponent<Camera>().enabled = true;
     }
 }
