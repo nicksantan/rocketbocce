@@ -38,6 +38,7 @@ public class PlayerControllerScript : MonoBehaviour
         cameraManager = GameObject.FindGameObjectWithTag("CameraManager");
         previewBallManager = GameObject.FindGameObjectWithTag("PreviewBallManager");
         currentPhase = GamePhase.throwing;
+
     }
 
     private void FixedUpdate()
@@ -51,6 +52,22 @@ public class PlayerControllerScript : MonoBehaviour
     }
     // Update is called once per frame
     void Update() {
+
+        if (primaryPlayer.GetButtonDown("Reset"))
+        {
+            Debug.Log("Resetting the ball");
+            ballInFlight = false;
+            // MOve it back to position
+            theBall.transform.position = new Vector3(0f, 0f, -6.8f);
+            //Turn off gravity and zero out velocity
+            theBall.GetComponent<Rigidbody>().velocity = new Vector3(0f, 0f, 0f);
+            // Activate gravity on the ball
+            theBall.GetComponent<Rigidbody>().useGravity = false;
+            currentPhase = GamePhase.throwing;
+            previewBallManager.GetComponent<PreviewBallManager>().RestorePreviews();
+
+        }
+
 
         // Is the player throwing??
         if (currentPhase == GamePhase.throwing)
@@ -83,19 +100,7 @@ public class PlayerControllerScript : MonoBehaviour
 
             }
 
-            if (primaryPlayer.GetButtonDown("Reset"))
-            {
-                Debug.Log("Resetting the ball");
-                ballInFlight = false;
-                // MOve it back to position
-                theBall.transform.position = new Vector3(0f, 0f, -6.8f);
-                //Turn off gravity and zero out velocity
-                theBall.GetComponent<Rigidbody>().velocity = new Vector3(0f, 0f, 0f);
-                // Activate gravity on the ball
-                theBall.GetComponent<Rigidbody>().useGravity = false;
-
-            }
-
+          
             GetMoveValue();
             GetPowerValue();
             Debug.Log(currentPowerInput);

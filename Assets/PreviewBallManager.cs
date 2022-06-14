@@ -35,4 +35,12 @@ public class PreviewBallManager : MonoBehaviour
             previewBalls[i].SetActive(false);
         }
     }
+
+    public void RestorePreviews()
+    {
+        for (int i = 0; i < previewBalls.Length; i++)
+        {
+            previewBalls[i].SetActive(true);
+        }
+    }
 }
